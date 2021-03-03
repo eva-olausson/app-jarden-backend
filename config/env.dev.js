@@ -33,7 +33,7 @@ if (!clientOriginUrl) {
 
 const clientOrigins = [
   "http://localhost:3000",
-  "https://appjarden.netlify.app/",
+  "https://appjarden.netlify.app",
 ];
 
 module.exports = {
