@@ -46,7 +46,8 @@ router.post("/", checkJwt, async (req, res) => {
     });
 
     newBooking = await newBooking.save();
-    res.json(newBooking);
+    const allBookings = await Booking.find({ user: user._id });
+    res.json(allBookings);
     console.log(newBooking);
   } catch (error) {
     res.status(400).send({ error: error.message });
