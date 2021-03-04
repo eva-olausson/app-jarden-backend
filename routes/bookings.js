@@ -48,8 +48,34 @@ router.post("/", checkJwt, async (req, res) => {
     newBooking = await newBooking.save();
     const allBookings = await Booking.find({ user: user._id });
     res.json(allBookings);
-    console.log(newBooking);
+    console.log(allBookings);
   } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+});
+
+router.delete("/:bookingId", checkJwt, async (req, res) => {
+  const bookingId = req.params.bookingId;
+  const user = await User.findOne({ sub: req.user.sub });
+
+  const booking = await Booking.findOne({
+    _id: bookingId,
+  });
+
+  if (!booking) {
+    return sendStatus(404);
+  }
+
+  if (booking.user !== user._id) {
+    return res.sendStatus(403);
+  }
+
+  try {
+    const removedBooking = await Booking.remove({
+      _id: bookingId,
+    });
+    res.json(removedBooking);
+  } catch (err) {
     res.status(400).send({ error: error.message });
   }
 });
