@@ -10,10 +10,16 @@ router.get("/", async (req, res) => {
       "profileSlug nickname, picture"
     );
 
+    console.log(instructors, "1");
+
     const instructorIds = instructors.map((instructor) => instructor._id);
 
+    console.log(instructorIds, "2");
+    // todo: lookup genererar en array i created, fixa så att det istället blir det första elementet ($project i mongodb)
     const firstClassByInstructor = await Class.aggregate()
-      .match({ createdBy: { $in: instructorIds } }) // matcha alla element i en array
+      .match({ createdBy: { $in: instructorIds } }) // $in måste användas om man vill matcha på alla element i en array
+      //.match({ createdBy: "ett id" }) // för att hitta ett dokument med ett specifikt id
+      // .lookup är ekvivalent med .populate på en query (.find)
       .lookup({
         from: "users",
         localField: "createdBy",
@@ -21,13 +27,18 @@ router.get("/", async (req, res) => {
         as: "createdBy",
       })
       .unwind("createdBy")
-      .sort({ streaming_date: "ascending" })
+      .sort({ streaming_date: "ascending" }) // sortera innan du grupperar
       .group({ _id: "$createdBy", class: { $first: "$$ROOT" } }); // ta första elementet i varje gruppering och lägg i "class"
+    //.group({ _id: "$createdBy", class: { $push: "$$ROOT" } }); // ta alla element i varje gruppering och lägg i "class"
+
+    console.log(firstClassByInstructor, "3");
 
     const classes = firstClassByInstructor.map((item) => item.class);
+    console.log(classes, "4");
 
     res.json(classes);
   } catch (err) {
+    console.log(err);
     res.status(400).send({ message: err });
   }
 });
