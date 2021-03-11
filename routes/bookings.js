@@ -66,7 +66,7 @@ router.delete("/:bookingId", checkJwt, async (req, res) => {
     return sendStatus(404);
   }
 
-  if (booking.user !== user._id) {
+  if (!booking.user.equals(user._id)) {
     return res.sendStatus(403);
   }
 
@@ -74,7 +74,8 @@ router.delete("/:bookingId", checkJwt, async (req, res) => {
     const removedBooking = await Booking.remove({
       _id: bookingId,
     });
-    res.json(removedBooking);
+    console.log(removedBooking, "removedBooking");
+    res.sendStatus(200);
   } catch (err) {
     res.status(400).send({ error: error.message });
   }
