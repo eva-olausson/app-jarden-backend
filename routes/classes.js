@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const Class = require("../models/Class");
+const User = require("../models/User");
 
-// Fix error codes
+const { checkJwt } = require("../auth0/check-jwt");
 
 router.get("/", async (req, res) => {
   try {
@@ -34,15 +35,18 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/:classId", async (req, res) => {
+router.get("/:classId", checkJwt, async (req, res) => {
   try {
     const specificClass = await Class.findById(req.params.classId);
-    // Hämta instruktor för klassen
-    res.json(specificClass);
+    const instructor = await User.findById(specificClass.createdBy);
 
-    if (!specificClass) return res.status(404).send({ error: "Not found" });
+    // Hämta instruktör för passet
+
+    if (!specificClass || !instructor)
+      return res.status(404).send({ error: "Not found" });
+    res.json({ specificClass, instructor });
   } catch (err) {
-    res.json({ message: err });
+    res.status(404).send({ error: "Not found" });
   }
 });
 

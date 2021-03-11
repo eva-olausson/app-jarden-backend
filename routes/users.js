@@ -8,8 +8,6 @@ const { checkJwt } = require("../auth0/check-jwt");
 
 router.get("/me", checkJwt, async (req, res) => {
   try {
-    console.log(req.headers.authorization);
-    console.log(req.user);
     let user = await User.findOne({ sub: req.user.sub });
     if (user === null) {
       const userResponse = await getUserInfo(req.headers.authorization);
@@ -26,7 +24,6 @@ router.get("/me", checkJwt, async (req, res) => {
     }
     return user ? res.json(user) : res.sendStatus(204);
   } catch (err) {
-    //res.json({ message: err });
     res.status(400).send({
       message: err,
     });
@@ -56,8 +53,6 @@ router.post("/me", checkJwt, async (req, res) => {
   newUser = await newUser.save();
   res.json(newUser);
 });
-
-// Update userprofile in client
 
 router.patch("/me", checkJwt, async (req, res) => {
   try {

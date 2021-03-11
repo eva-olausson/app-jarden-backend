@@ -4,7 +4,7 @@ const User = require("../models/User");
 const Class = require("../models/Class");
 const { checkJwt } = require("../auth0/check-jwt");
 
-// get specific user
+// get a specific instructor
 
 router.get("/:slug", async (req, res) => {
   try {

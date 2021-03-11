@@ -5,8 +5,6 @@ const User = require("../models/User");
 const Class = require("../models/Class");
 const { checkJwt } = require("../auth0/check-jwt");
 
-// get my bookings
-
 router.get("/", checkJwt, async (req, res) => {
   try {
     const user = await User.findOne({ sub: req.user.sub });
@@ -21,8 +19,6 @@ router.get("/", checkJwt, async (req, res) => {
       },
     });
 
-    console.log("My bookings", bookings);
-
     res.json(bookings);
   } catch (error) {
     res.status(400).send({ error: error.message });
@@ -32,13 +28,11 @@ router.get("/", checkJwt, async (req, res) => {
 router.post("/", checkJwt, async (req, res) => {
   try {
     const { classId } = req.body;
-    const user = await User.findOne({ sub: req.user.sub }); // Hämta user
+    const user = await User.findOne({ sub: req.user.sub });
     if (!user) throw new Error("User does not exist");
 
-    const classObj = await Class.findOne({ _id: classId }); // Hämta pass
+    const classObj = await Class.findOne({ _id: classId });
     if (!classObj) throw new Error("Class does not exist");
-
-    // Sen skapa ny bokning
 
     let newBooking = new Booking({
       class: classId,
@@ -48,7 +42,6 @@ router.post("/", checkJwt, async (req, res) => {
     newBooking = await newBooking.save();
     const allBookings = await Booking.find({ user: user._id });
     res.json(allBookings);
-    console.log(allBookings);
   } catch (error) {
     res.status(400).send({ error: error.message });
   }
@@ -74,7 +67,6 @@ router.delete("/:bookingId", checkJwt, async (req, res) => {
     const removedBooking = await Booking.remove({
       _id: bookingId,
     });
-    console.log(removedBooking, "removedBooking");
     res.sendStatus(200);
   } catch (err) {
     res.status(400).send({ error: error.message });
