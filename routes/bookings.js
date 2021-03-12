@@ -64,10 +64,19 @@ router.delete("/:bookingId", checkJwt, async (req, res) => {
   }
 
   try {
-    const removedBooking = await Booking.remove({
+    await Booking.remove({
       _id: bookingId,
     });
-    res.sendStatus(200);
+    const user = await User.findOne({ sub: req.user.sub });
+    const bookings = await Booking.find({ user: user._id }).populate({
+      path: "class", // Populate bookings med class path från Class Model (alla pass) och populate med path createdBy från User Model (instructor users).
+      model: Class,
+      populate: {
+        path: "createdBy",
+        model: User,
+      },
+    });
+    res.json(bookings);
   } catch (err) {
     res.status(400).send({ error: error.message });
   }
