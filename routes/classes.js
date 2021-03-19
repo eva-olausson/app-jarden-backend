@@ -5,6 +5,8 @@ const User = require("../models/User");
 
 const { checkJwt } = require("../auth0/check-jwt");
 
+//Only specific class is used at present.
+
 router.get("/", async (req, res) => {
   try {
     const classes = await Class.find();
@@ -35,12 +37,12 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Get a specific class and the user that created the class
+
 router.get("/:classId", checkJwt, async (req, res) => {
   try {
     const specificClass = await Class.findById(req.params.classId);
     const instructor = await User.findById(specificClass.createdBy);
-
-    // Hämta instruktör för passet
 
     if (!specificClass || !instructor)
       return res.status(404).send({ error: "Not found" });

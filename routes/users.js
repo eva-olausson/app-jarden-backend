@@ -4,7 +4,7 @@ var axios = require("axios").default;
 const User = require("../models/User");
 const { checkJwt } = require("../auth0/check-jwt");
 
-// get specific user
+// Get user. If user does not exist in db create new user, using ref sub: from Auth0 jwt-token.
 
 router.get("/me", checkJwt, async (req, res) => {
   try {
@@ -29,6 +29,8 @@ router.get("/me", checkJwt, async (req, res) => {
     });
   }
 });
+
+// Auth0 getUserInfo endpoint
 
 const getUserInfo = async (token) => {
   var options = {

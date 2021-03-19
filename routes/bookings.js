@@ -5,13 +5,15 @@ const User = require("../models/User");
 const Class = require("../models/Class");
 const { checkJwt } = require("../auth0/check-jwt");
 
+// Get bookings
+
 router.get("/", checkJwt, async (req, res) => {
   try {
     const user = await User.findOne({ sub: req.user.sub });
     const bookings = await Booking.find({
       user: user._id,
     }).populate({
-      path: "class", // Populate bookings med class path från Class Model (alla pass) och populate med path createdBy från User Model (instructor users).
+      path: "class", // Populate bookings with class path from Class Model (all classes) and with path createdBy from the User Model (instructor users).
       model: Class,
       populate: {
         path: "createdBy",
@@ -24,6 +26,8 @@ router.get("/", checkJwt, async (req, res) => {
     res.status(400).send({ error: error.message });
   }
 });
+
+// Create a booking / Book a class
 
 router.post("/", checkJwt, async (req, res) => {
   try {
@@ -47,6 +51,8 @@ router.post("/", checkJwt, async (req, res) => {
   }
 });
 
+// Remove a booking
+
 router.delete("/:bookingId", checkJwt, async (req, res) => {
   const bookingId = req.params.bookingId;
   const user = await User.findOne({ sub: req.user.sub });
@@ -69,7 +75,7 @@ router.delete("/:bookingId", checkJwt, async (req, res) => {
     });
     const user = await User.findOne({ sub: req.user.sub });
     const bookings = await Booking.find({ user: user._id }).populate({
-      path: "class", // Populate bookings med class path från Class Model (alla pass) och populate med path createdBy från User Model (instructor users).
+      path: "class",
       model: Class,
       populate: {
         path: "createdBy",
